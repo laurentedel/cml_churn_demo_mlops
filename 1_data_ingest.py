@@ -1,3 +1,6 @@
+## Data Ingest
+# This script grabs the CSV file from the Cloud Storage location set in step 0 into a Spark DataFrame. Its adds schema and then writes the dataframe to a hive table.
+
 import os
 import sys
 from pyspark.sql import SparkSession
@@ -9,9 +12,9 @@ spark = SparkSession\
     .getOrCreate()
 
 # Add the following config if you want to run on the k8s cluster and remove `local[*]`
-#    .config("spark.hadoop.fs.s3a.s3guard.ddb.region","us-east-1")\
 #    .config("spark.yarn.access.hadoopFileSystems","s3a://demo-aws-2//")\
     
+# Since we know the data already, we can add schema upfront. This is good practice as Spark will read *all* the Data if you try infer the schema.
 
 schema = StructType(
   [
@@ -39,10 +42,11 @@ schema = StructType(
   ]
 )
 
-s3_bucket = os.environ['STORAGE']
-    
+storage = os.environ['STORAGE']
+
+# Read the CSV into a Spark DataFrame    
 telco_data = spark.read.csv(
-  "{}/datalake/data/churn/WA_Fn-UseC_-Telco-Customer-Churn-.csv".format(s3_bucket),
+  "{}/datalake/data/churn/WA_Fn-UseC_-Telco-Customer-Churn-.csv".format(storage),
   header=True,
   schema=schema,
   sep=',',
@@ -53,6 +57,7 @@ telco_data.show()
 
 telco_data.printSchema()
 
+# Write the Spark DataFrame to the local cdsw file system as a single file.
 telco_data.coalesce(1).write.csv(
   "file:/home/cdsw/raw/telco-data/",
   mode='overwrite',
@@ -63,13 +68,20 @@ spark.sql("show databases").show()
 
 spark.sql("show tables in default").show()
 
-# this code is here to create the table in Hive used be the other parts of the project.
-# It has already been run
-#telco_data\
-#  .write.format("parquet")\
-#  .mode("overwrite")\
-#  .saveAsTable(
-#    'default.telco_churn'
-#)
+# This is here to create the table in Hive used be the other parts of the project.
+# If the table already exists, it does not. 
 
+if ('telco_churn' not in list(spark.sql("show tables in default").toPandas()['tableName'])):
+  print("creating the telco_churn database")
+  telco_data\
+    .write.format("parquet")\
+    .mode("overwrite")\
+    .saveAsTable(
+      'default.telco_churn'
+  )
+
+# Show the data in the hive table
 spark.sql("select * from default.telco_churn").show()
+
+# To get detailed information about the hive table run.
+spark.sql("describe formatted default.telco_churn").toPandas()

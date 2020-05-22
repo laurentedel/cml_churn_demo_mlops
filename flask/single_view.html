@@ -16,7 +16,7 @@
     </div>
     <div id='features' style='clear:both;'></div>
     <script>
-        const accessKey = "mglmt9qf8turg07g9psv1pmzhxqimtmm";
+        const accessKey = "mhee4ccjynnu7wu4hx4d60pca2s63gyi";
         in_url = new URL(window.location.href)
         out_url = new URL(window.location.origin + window.location.pathname)
 
@@ -57,8 +57,7 @@
             });
 
         Promise.all([features_numeric, features_categorical, dataset]).then(values => {
-            temp_vals = values;
-            console.log(values);
+            console.log(values[2])
             _.each(values[2].response.prediction.data, function (value, key) {
                 out_url.searchParams.set(key, value)
             })
@@ -181,6 +180,6 @@
                     }
 
                 )
-        })
+        }).catch(err => alert("Disable Model Authentication First"));
     </script>
 </body>
