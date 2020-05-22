@@ -195,7 +195,7 @@ From the Go to the **Applications** section and select "New Application" with th
 * **Name**: Churn Analysis App
 * **Subdomain**: churn-app _(note: this needs to be unique, so if you've done this before, 
 pick a more random subdomain name)_
-* **Script**: 5_application.py
+* **Script**: 6_application.py
 * **Kernel**: Python 3
 * **Engine Profile**: 1vCPU / 2 GiB Memory
 
