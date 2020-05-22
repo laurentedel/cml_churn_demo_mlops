@@ -9,8 +9,11 @@ from churnexplainer import ExplainedModel
 #Load the model save earlier.
 em = ExplainedModel(model_name='telco_linear',data_dir='/home/cdsw')
 
+# *Note:* If you want to test this in a session, comment out the line `@cdsw.model_metrics` below. Don't forget to uncomment when you
+# deploy, or it won't write the metrics to the database 
 @cdsw.model_metrics
-#This is the main function used for serving the model. It will take in the JSON formatted arguments , calculate the probablity of churn and create a LIME explainer explained instance and return that as JSON.
+# This is the main function used for serving the model. It will take in the JSON formatted arguments , calculate the probablity of 
+# churn and create a LIME explainer explained instance and return that as JSON.
 def explain(args):
     data = dict(ChainMap(args, em.default_data))
     data = em.cast_dct(data)
