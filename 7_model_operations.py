@@ -49,7 +49,10 @@ model_endpoint = HOST.split("//")[0] + "//modelservice." + HOST.split("//")[1] +
 # the 'mertics' key length.
 
 model_metrics = cdsw.read_metrics(model_crn=Model_CRN,model_deployment_crn=Deployment_CRN)
-metric_start_index = len(model_metrics["metrics"])
+if (model_metrics["metrics"] == None):
+  metric_start_index = 0
+else:
+  metric_start_index = len(model_metrics["metrics"])
   
 ## Generate Sample Data
 # This section will grab 1500 randome samples from the data set and simulate 500 predictions 
