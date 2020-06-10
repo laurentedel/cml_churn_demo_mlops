@@ -77,11 +77,11 @@ if ('telco_churn' not in list(spark.sql("show tables in default").toPandas()['ta
     .write.format("parquet")\
     .mode("overwrite")\
     .saveAsTable(
-      'default.telco_churn_' + os.environ["HADOOP_USER_NAME"]
+      'default.telco_churn'
   )
 
 # Show the data in the hive table
-spark.sql("select * from default.telco_churn_" + os.environ["HADOOP_USER_NAME"]).show()
+spark.sql("select * from default.telco_churn").show()
 
 # To get detailed information about the hive table run.
-spark.sql("describe formatted default.telco_churn_" + os.environ["HADOOP_USER_NAME"]).toPandas()
+spark.sql("describe formatted default.telco_churn").toPandas()
