@@ -55,8 +55,8 @@ else:
   metric_start_index = len(model_metrics["metrics"])
   
 ## Generate Sample Data
-# This section will grab 1500 randome samples from the data set and simulate 500 predictions 
-# per week. The live model will be called 1500 times in 3 loops. Week 1 the data passes directly 
+# This section will grab 750 random samples from the data set and simulate 250 predictions 
+# per week. The live model will be called 750 times in 3 loops. Week 1 the data passes directly 
 # to the model, for weeks 2 and 3, will introduce some errors into the actual churn 
 # value, which will make the model less accurate. These accuracy measures are tracked 
 # per week and plotted at the end.
@@ -71,14 +71,14 @@ def flip_churn(item,percent):
   else:
     return item
 
-# Get 1500 samples  
-df_sample = df.sample(1500)
+# Get 750 samples  
+df_sample = df.sample(750)
 record_count = 0
 
 ### Week 1
 
-# Grab the first 500 rows
-df_week_1 = df_sample.iloc[0:500,:]
+# Grab the first 250 rows
+df_week_1 = df_sample.iloc[0:250,:]
 df_week_1.groupby('Churn')['Churn'].count() 
 
 # Clean up the data
@@ -120,9 +120,9 @@ w1_end_timestamp_ms = int(round(time.time() * 1000)) - 7*24*60*60*1000*2
 cdsw.track_aggregate_metrics({"accuracy": df_week_1_accuracy}, w1_start_timestamp_ms , w1_end_timestamp_ms, model_deployment_crn=Deployment_CRN)
 
 ### Week 2
-# Same as week 1, now with rows 501 - 1000
+# Same as week 1, now with rows 251 - 500
 
-df_week_2 = df_sample.iloc[501:1000,:]
+df_week_2 = df_sample.iloc[251:500,:]
 
 df_week_2 = df_week_2.apply(lambda x: flip_churn(x,0.2),axis=1)
 df_week_2.groupby('Churn')['Churn'].count() 
@@ -156,9 +156,9 @@ w2_end_timestamp_ms = int(round(time.time() * 1000)) - 7*24*60*60*1000
 cdsw.track_aggregate_metrics({"accuracy": df_week_2_accuracy}, w2_start_timestamp_ms , w2_end_timestamp_ms, model_deployment_crn=Deployment_CRN)
   
 ### Week 3
-# Same as week 1, now with rows 1001 - 1500
+# Same as week 1, now with rows 501 - 750
 
-df_week_3 = df_sample.iloc[1001:1500,:]
+df_week_3 = df_sample.iloc[501:750,:]
 
 df_week_3 = df_week_3.apply(lambda x: flip_churn(x,0.4),axis=1)
 df_week_3.groupby('Churn')['Churn'].count() 
